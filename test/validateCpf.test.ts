@@ -9,7 +9,7 @@ test.each(['078.300.210-66', '562.523.340-30', '639.951.250-69'])(
 );
 
 test.each(['11111111111', '560-30', '639.001.000-00'])(
-	'Deve testar um cpf valido: %s',
+	'Deve testar um cpf invalido: %s',
 	(cpf: string) => {
 		const isValid = validateCpf(cpf);
 		expect(isValid).toBe(false);
