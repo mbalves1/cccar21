@@ -4,7 +4,7 @@ import pgp from 'pg-promise';
 const app = express();
 app.use(express.json());
 
-const connection = pgp()('postgres://postgres:123456@localhost:5432/app');
+const connection = pgp()('postgres://postgres:123456@db:5432/app');
 
 app.post('/signup', async (req: Request, res: Response) => {
 	console.log('/signup');
