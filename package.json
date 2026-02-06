@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "npx nodemon src/main.ts",
-		"jest": "npx jest test/main.ts",
+		"jest": "npx jest test/main.test.ts",
 		"docker:build": "docker build -t cccar21_backend docker",
 		"docker:run": "docker run -it -v $(pwd)/.:/app cccar21_backend bash",
 		"compose:up": "docker compose -f docker/docker-compose.yaml up -d --build",

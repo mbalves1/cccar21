@@ -1,6 +1,6 @@
-drop schema if exists cccar
+drop schema if exists cccar cascade;
 
-create schema cccar
+create schema cccar;
 
 create table cccar.account (
   account_id uuid primary key,
@@ -8,4 +8,4 @@ create table cccar.account (
   email text,
   document text,
   password text
-)
+);
