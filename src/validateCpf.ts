@@ -1,28 +1,31 @@
 export function validateCpf(cpf: string) {
 	if (!cpf) return false;
-	cpf = cpf.replace(/\D/g, '');
+	cpf = clean(cpf);
 	if (cpf.length !== 11) return false;
-	if (cpf.split('').every((c) => c === cpf[0])) return false;
-	let d1 = 0;
-	let d2 = 0;
-	let dg1 = 0;
-	let dg2 = 0;
-	let rest = 0;
-	let digito;
-
-	for (let nCount = 1; nCount < cpf.length - 1; nCount++) {
-		digito = parseInt(cpf.substring(nCount - 1, nCount));
-		d1 = d1 + (11 - nCount) * digito;
-		d2 = d2 + (12 - nCount) * digito;
-	}
-
-	rest = d1 % 11;
-	dg1 = rest < 2 ? (dg1 = 0) : 11 - rest;
-	d2 += 2 * dg1;
-	rest = d2 % 11;
-	if (rest < 2) dg2 = 0;
-	else dg2 = 11 - rest;
-
-	let nDigVerific = cpf.substring(cpf.length - 2, cpf.length);
+	if (allDigitsTheSame(cpf)) return false;
+	const dg1 = calculateDigit(cpf, 10);
+	const dg2 = calculateDigit(cpf, 11);
+	let nDigVerific = extractCheckDigit(cpf);
 	return nDigVerific == `${dg1}${dg2}`;
+}
+
+function clean(cpf: string) {
+	return cpf.replace(/\D/g, '');
+}
+
+function allDigitsTheSame(cpf: string) {
+	return cpf.split('').every((c) => c === cpf[0]);
+}
+
+function extractCheckDigit(cpf: string) {
+	return cpf.slice(9);
+}
+
+function calculateDigit(cpf: string, factor: number) {
+	let total = 0;
+	for (const digit of cpf) {
+		if (factor > 1) total += parseInt(digit) * factor--;
+	}
+	const rest = total % 11;
+	return rest < 2 ? 0 : 11 - rest;
 }
