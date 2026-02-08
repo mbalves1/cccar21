@@ -2,6 +2,7 @@ import express, { Response, Request } from 'express';
 import crypto from 'crypto';
 import pgp from 'pg-promise';
 import { validateCpf } from './validateCpf';
+import { validatePassword } from './validatePassword';
 const app = express();
 app.use(express.json());
 
@@ -10,14 +11,6 @@ const connection = pgp()('postgres://postgres:123456@db:5432/app');
 
 // Roidando local
 // const connection = pgp()('postgres://postgres:123456@localhost:5432/app');
-
-function validatePassword(password: string) {
-	if (password.length < 8) return false;
-	if (!password.match(/[a-z]/)) return false;
-	if (!password.match(/[A-Z]/)) return false;
-	if (!password.match(/[0-9]/)) return false;
-	return true;
-}
 
 app.post('/signup', async (req: Request, res: Response) => {
 	const account = req.body;
