@@ -1,11 +1,15 @@
-# npm run compose:up
+yarn compose:up
+or
+npm run compose:up
 
-# npm run compose:exec
+yarn compose:exec
+or
+npm run compose:exec
 
-<!-- npx ts-node src/main.ts -->
+# 1
 
-<!-- Rodando local
-npm test
+npx nodemon src/main.ts
 
-Rodando Container
-compose:exec -->
+# 2
+
+npx jest

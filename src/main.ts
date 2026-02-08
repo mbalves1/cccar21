@@ -1,6 +1,7 @@
 import express, { Response, Request } from 'express';
 import crypto from 'crypto';
 import pgp from 'pg-promise';
+import { validateCpf } from './validateCpf';
 const app = express();
 app.use(express.json());
 
@@ -10,10 +11,42 @@ const connection = pgp()('postgres://postgres:123456@db:5432/app');
 // Roidando local
 // const connection = pgp()('postgres://postgres:123456@localhost:5432/app');
 
+function validatePassword(password: string) {
+	if (password.length < 8) return false;
+	if (!password.match(/[a-z]/)) return false;
+	if (!password.match(/[A-Z]/)) return false;
+	if (!password.match(/[0-9]/)) return false;
+	return true;
+}
+
 app.post('/signup', async (req: Request, res: Response) => {
 	const account = req.body;
 	const accountId = crypto.randomUUID();
-	console.log('/signup', account);
+	// console.log('/signup', account);
+	if (!account.name.match(/[a-zA-Z]+ [a-zA-Z]+/)) {
+		res.status(422).json({
+			message: 'Invalid name',
+		});
+		return;
+	}
+	if (!account.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+		res.status(422).json({
+			message: 'Invalid email',
+		});
+		return;
+	}
+	if (!validateCpf(account.document)) {
+		res.status(422).json({
+			message: 'Invalid document',
+		});
+		return;
+	}
+	if (!validatePassword(account.password)) {
+		res.status(422).json({
+			message: 'Invalid password',
+		});
+		return;
+	}
 	await connection.query(
 		'insert into cccar.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)',
 		[
@@ -32,7 +65,10 @@ app.post('/signup', async (req: Request, res: Response) => {
 app.get('/accounts/:accountId', async (req: Request, res: Response) => {
 	const accountId = req.params.accountId;
 	console.log(`/accounts/${accountId}`);
-	const [account] = await connection.query('select * from cccar.account', []);
+	const [account] = await connection.query(
+		'select * from cccar.account where account_id = $1',
+		[accountId],
+	);
 	console.log(account);
 	res.json(account);
 });
