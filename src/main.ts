@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import pgp from 'pg-promise';
 import { validateCpf } from './validateCpf';
 import { validatePassword } from './validatePassword';
+import { validateEmail } from './validateEmail';
+import { validateName } from './validateName';
 const app = express();
 app.use(express.json());
 
@@ -16,13 +18,13 @@ app.post('/signup', async (req: Request, res: Response) => {
 	const account = req.body;
 	const accountId = crypto.randomUUID();
 	// console.log('/signup', account);
-	if (!account.name.match(/[a-zA-Z]+ [a-zA-Z]+/)) {
+	if (!validateName(account.name)) {
 		res.status(422).json({
 			message: 'Invalid name',
 		});
 		return;
 	}
-	if (!account.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+	if (!validateEmail(account.email)) {
 		res.status(422).json({
 			message: 'Invalid email',
 		});
