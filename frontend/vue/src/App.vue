@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-	<div>Ola Murilo</div>
+	<h1>Ola Murilo</h1>
 </template>
 
 <style scoped></style>
