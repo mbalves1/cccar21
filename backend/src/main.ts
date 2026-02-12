@@ -1,12 +1,14 @@
 import express, { Response, Request } from 'express';
 import crypto from 'crypto';
 import pgp from 'pg-promise';
+import cors from 'cors';
 import { validateCpf } from './validateCpf';
 import { validatePassword } from './validatePassword';
 import { validateEmail } from './validateEmail';
 import { validateName } from './validateName';
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // roando no container
 const connection = pgp()('postgres://postgres:123456@db:5432/app');
@@ -50,6 +52,7 @@ app.post('/signup', async (req: Request, res: Response) => {
 			account.email,
 			account.document,
 			account.password,
+			account.message,
 		],
 	);
 	res.json({
