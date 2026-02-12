@@ -15,3 +15,19 @@ test('Deve criar uma conta', async ({ page }) => {
 	await page.locator('.button-signup').click();
 	await expect(page.locator('.span-message')).toHaveText('success');
 });
+
+test('Não deve criar uma conta com nome invalido', async ({ page }) => {
+	await page.goto('http://localhost:5173');
+	const input = {
+		name: 'John',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+	await page.locator('.input-name').fill(input.name);
+	await page.locator('.input-email').fill(input.email);
+	await page.locator('.input-document').fill(input.document);
+	await page.locator('.input-password').fill(input.password);
+	await page.locator('.button-signup').click();
+	await expect(page.locator('.span-message')).toHaveText('Invalid name');
+});
