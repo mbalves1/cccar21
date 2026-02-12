@@ -23,6 +23,8 @@
 		if (output.accountId) {
 			form.value.accountId = output.accountId;
 			form.value.message = 'success';
+		} else {
+			form.value.message = output.message;
 		}
 	}
 </script>
