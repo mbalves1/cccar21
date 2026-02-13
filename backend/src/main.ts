@@ -1,14 +1,9 @@
-import express, { Response, Request } from 'express';
 import crypto from 'crypto';
 import pgp from 'pg-promise';
-import cors from 'cors';
 import { validateCpf } from './validateCpf';
 import { validatePassword } from './validatePassword';
 import { validateEmail } from './validateEmail';
 import { validateName } from './validateName';
-const app = express();
-app.use(express.json());
-app.use(cors());
 
 // roando no container
 const connection = pgp()('postgres://postgres:123456@db:5432/app');
@@ -16,34 +11,13 @@ const connection = pgp()('postgres://postgres:123456@db:5432/app');
 // Roidando local
 // const connection = pgp()('postgres://postgres:123456@localhost:5432/app');
 
-app.post('/signup', async (req: Request, res: Response) => {
-	const account = req.body;
+export const signup = async (account: any) => {
 	const accountId = crypto.randomUUID();
-	// console.log('/signup', account);
-	if (!validateName(account.name)) {
-		res.status(422).json({
-			message: 'Invalid name',
-		});
-		return;
-	}
-	if (!validateEmail(account.email)) {
-		res.status(422).json({
-			message: 'Invalid email',
-		});
-		return;
-	}
-	if (!validateCpf(account.document)) {
-		res.status(422).json({
-			message: 'Invalid document',
-		});
-		return;
-	}
-	if (!validatePassword(account.password)) {
-		res.status(422).json({
-			message: 'Invalid password',
-		});
-		return;
-	}
+
+	if (!validateName(account.name)) throw new Error('Invalid name');
+	if (!validateEmail(account.email)) throw new Error('Invalid email');
+	if (!validateCpf(account.document)) throw new Error('Invalid document');
+	if (!validatePassword(account.password)) throw new Error('Invalid password');
 	await connection.query(
 		'insert into cccar.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)',
 		[
@@ -55,20 +29,16 @@ app.post('/signup', async (req: Request, res: Response) => {
 			account.message,
 		],
 	);
-	res.json({
+	return {
 		accountId,
-	});
-});
+	};
+};
 
-app.get('/accounts/:accountId', async (req: Request, res: Response) => {
-	const accountId = req.params.accountId;
-	console.log(`/accounts/${accountId}`);
+export const getAccount = async (accountId: any) => {
 	const [account] = await connection.query(
 		'select * from cccar.account where account_id = $1',
 		[accountId],
 	);
 	console.log(account);
-	res.json(account);
-});
-
-app.listen(3000);
+	return account;
+};

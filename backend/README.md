@@ -8,7 +8,9 @@ npm run compose:exec
 
 # 1
 
-npx nodemon src/main.ts
+npx nodemon src/api.ts
+
+### npx nodemon src/main.ts
 
 # 2
 
