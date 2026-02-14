@@ -1,7 +1,8 @@
-import { getAccountById, saveAccount } from '../src/data';
 import crypto from 'crypto';
+import { AccountDAODatabase } from '../src/AccountDAO';
 
 test('Deve persistir uma conta', async () => {
+	const accountDAO = new AccountDAODatabase();
 	const account = {
 		accountId: crypto.randomUUID(),
 		name: 'John Doe',
@@ -10,8 +11,8 @@ test('Deve persistir uma conta', async () => {
 		password: 'mnbVCX1234',
 	};
 
-	await saveAccount(account);
-	const savedAccount = await getAccountById(account.accountId);
+	await accountDAO.save(account);
+	const savedAccount = await accountDAO.getById(account.accountId);
 	expect(savedAccount.account_id).toBe(account.accountId);
 	expect(savedAccount.name).toBe(account.name);
 	expect(savedAccount.email).toBe(account.email);
