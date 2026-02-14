@@ -1,4 +1,13 @@
-import { getAccount, signup } from '../src/main';
+import { AccountDAODatabase, AccountDAOMemory } from '../src/AccountDAO';
+import AccountService from '../src/AccountService';
+
+let accountService: AccountService;
+
+beforeEach(() => {
+	const accountDAO = new AccountDAODatabase();
+	// const accountDAO = new AccountDAOMemory();
+	accountService = new AccountService(accountDAO);
+});
 
 test('Deve criar uma conta', async () => {
 	const input = {
@@ -8,8 +17,10 @@ test('Deve criar uma conta', async () => {
 		password: 'mnbVCX1234',
 	};
 
-	const outputSignup = await signup(input);
-	const outputGetAccount = await getAccount(outputSignup.accountId);
+	const outputSignup = await accountService.signup(input);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
 	expect(outputSignup.accountId).toBeDefined();
 	expect(outputGetAccount.name).toBe(input.name);
 	expect(outputGetAccount.email).toBe(input.email);
@@ -24,7 +35,9 @@ test('Não deve criar uma conta se nome for inválido', async () => {
 		document: '07830021066',
 		password: 'mnbVCX1234',
 	};
-	await expect(() => signup(input)).rejects.toThrow(new Error('Invalid name'));
+	await expect(() => accountService.signup(input)).rejects.toThrow(
+		new Error('Invalid name'),
+	);
 });
 
 test('Não deve criar uma conta se email for inválido', async () => {
@@ -35,7 +48,9 @@ test('Não deve criar uma conta se email for inválido', async () => {
 		password: 'mnbVCX1234',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(new Error('Invalid email'));
+	await expect(() => accountService.signup(input)).rejects.toThrow(
+		new Error('Invalid email'),
+	);
 });
 
 test('Não deve criar uma conta se documento for inválido', async () => {
@@ -46,7 +61,7 @@ test('Não deve criar uma conta se documento for inválido', async () => {
 		password: 'mnbVCX1234',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid document'),
 	);
 });
@@ -59,7 +74,7 @@ test('Não deve criar uma conta se a senha for inválido', async () => {
 		password: 'mnbVCX',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
 });
@@ -72,7 +87,7 @@ test('Não deve criar uma conta se a senha tiver menos de 8 caracteres', async (
 		password: 'mnbVCX',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
 });
@@ -85,7 +100,7 @@ test('Não deve criar uma conta se a senha não tiver números', async () => {
 		password: 'mnbVCXERT',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
 });
@@ -98,7 +113,7 @@ test('Não deve criar uma conta se a senha não tiver maiusculas', async () => {
 		password: 'mnbvhhdjjdh233',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
 });
@@ -111,7 +126,7 @@ test('Não deve criar uma conta se a senha não tiver minusculas', async () => {
 		password: 'MSIKADI@#123232',
 	};
 
-	await expect(() => signup(input)).rejects.toThrow(
+	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
 });
