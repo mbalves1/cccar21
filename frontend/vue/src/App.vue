@@ -1,5 +1,7 @@
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { ref, inject } from 'vue';
+	import { AccountGatewayHttp, AccountGatewayMemory } from './AccountGateway';
+	import type AccountGateway from './AccountGateway';
 
 	const form = ref({
 		name: '',
@@ -9,17 +11,11 @@
 		accountId: '',
 		message: '',
 	});
+	const accountGateway = inject('accountGateway') as AccountGateway;
 
 	async function signup() {
 		const input = form.value;
-		const response = await fetch('http://localhost:3000/signup', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json',
-			},
-			body: JSON.stringify(input),
-		});
-		const output = await response.json();
+		const output = await accountGateway.save(input);
 		if (output.accountId) {
 			form.value.accountId = output.accountId;
 			form.value.message = 'success';
