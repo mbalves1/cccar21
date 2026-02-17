@@ -158,7 +158,7 @@ test('Deve criar uma conta com stub', async () => {
 	getByIdStub.restore();
 });
 
-test.only('Deve criar uma conta com spy', async () => {
+test('Deve criar uma conta com spy', async () => {
 	const saveSpy = sinon.spy(AccountDAODatabase.prototype, 'save');
 	const getByIdSpy = sinon.spy(AccountDAODatabase.prototype, 'getById');
 	const input = {
@@ -181,4 +181,48 @@ test.only('Deve criar uma conta com spy', async () => {
 	expect(getByIdSpy.calledWith(outputSignup.accountId)).toBe(true);
 	saveSpy.restore();
 	getByIdSpy.restore();
+});
+
+test('Deve criar uma conta com mock', async () => {
+	const accountDAOMock = sinon.mock(AccountDAODatabase.prototype);
+	accountDAOMock.expects('save').once().resolves();
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+	accountDAOMock.expects('getById').once().resolves(input);
+	const outputSignup = await accountService.signup(input);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
+	expect(outputSignup.accountId).toBeDefined();
+	expect(outputGetAccount.name).toBe(input.name);
+	expect(outputGetAccount.email).toBe(input.email);
+	expect(outputGetAccount.document).toBe(input.document);
+	expect(outputGetAccount.password).toBe(input.password);
+	accountDAOMock.verify();
+	accountDAOMock.restore();
+});
+
+test('Deve criar uma conta com fake', async () => {
+	const accountDAO = new AccountDAOMemory();
+	accountService = new AccountService(accountDAO);
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await accountService.signup(input);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
+	expect(outputSignup.accountId).toBeDefined();
+	expect(outputGetAccount.name).toBe(input.name);
+	expect(outputGetAccount.email).toBe(input.email);
+	expect(outputGetAccount.document).toBe(input.document);
+	expect(outputGetAccount.password).toBe(input.password);
 });
