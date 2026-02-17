@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import App from '../App.vue';
-import { AccountGatewayHttp } from '@/AccountGateway';
+import { AccountGatewayHttp, AccountGatewayMemory } from '@/AccountGateway';
 
 function sleep(timer: number) {
 	return new Promise((resolve) => {
@@ -13,7 +13,7 @@ function sleep(timer: number) {
 
 describe('Deve testar o componente principal', () => {
 	it('deve validar 1 igual a 1', async () => {
-		const accountGateway = new AccountGatewayHttp();
+		const accountGateway = new AccountGatewayMemory();
 		const wrapper = mount(App, {
 			global: {
 				provide: {
@@ -39,7 +39,7 @@ describe('Deve testar o componente principal', () => {
 	});
 
 	it('Não deve criar uma conta se o nome for invalido', async () => {
-		const accountGateway = new AccountGatewayHttp();
+		const accountGateway = new AccountGatewayMemory();
 		const wrapper = mount(App, {
 			global: {
 				provide: {

@@ -1,5 +1,6 @@
 import { AccountDAODatabase, AccountDAOMemory } from '../src/AccountDAO';
 import AccountService from '../src/AccountService';
+import sinon from 'sinon';
 
 let accountService: AccountService;
 
@@ -129,4 +130,30 @@ test('Não deve criar uma conta se a senha não tiver minusculas', async () => {
 	await expect(() => accountService.signup(input)).rejects.toThrow(
 		new Error('Invalid password'),
 	);
+});
+
+test('Deve criar uma conta com stub', async () => {
+	const saveStub = sinon.stub(AccountDAODatabase.prototype, 'save').resolves();
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const getByIdStub = sinon
+		.stub(AccountDAODatabase.prototype, 'getById')
+		.resolves(input);
+
+	const outputSignup = await accountService.signup(input);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
+	expect(outputSignup.accountId).toBeDefined();
+	expect(outputGetAccount.name).toBe(input.name);
+	expect(outputGetAccount.email).toBe(input.email);
+	expect(outputGetAccount.document).toBe(input.document);
+	expect(outputGetAccount.password).toBe(input.password);
+	saveStub.restore();
+	getByIdStub.restore();
 });
