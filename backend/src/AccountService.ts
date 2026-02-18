@@ -5,11 +5,14 @@ import { validatePassword } from './validatePassword';
 import { validateEmail } from './validateEmail';
 import { validateName } from './validateName';
 import AccountDAO, { AccountDAODatabase } from './AccountDAO';
-
-const accountDAO = new AccountDAODatabase();
+import Registry from './Registry';
 
 export default class AccountService {
-	constructor(readonly accountDAO: AccountDAO) {}
+	accountDAO: AccountDAO;
+
+	constructor(readonly registry: Registry) {
+		this.accountDAO = registry.inject('accountDAO');
+	}
 
 	async signup(account: any) {
 		account.accountId = crypto.randomUUID();
