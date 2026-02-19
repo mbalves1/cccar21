@@ -1,5 +1,8 @@
 export default class Registry {
 	dependencies: { [name: string]: any } = {};
+	static instance: Registry;
+
+	private constructor() {}
 
 	provide(name: string, dependency: any) {
 		this.dependencies[name] = dependency;
@@ -9,5 +12,12 @@ export default class Registry {
 		const dependency = this.dependencies[name];
 		if (!dependency) throw new Error(`Dependency ${name} not found `);
 		return dependency;
+	}
+
+	static getInstance() {
+		if (!Registry.instance) {
+			Registry.instance = new Registry();
+		}
+		return Registry.instance;
 	}
 }

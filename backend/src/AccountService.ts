@@ -10,8 +10,8 @@ import Registry from './Registry';
 export default class AccountService {
 	accountDAO: AccountDAO;
 
-	constructor(readonly registry: Registry) {
-		this.accountDAO = registry.inject('accountDAO');
+	constructor() {
+		this.accountDAO = Registry.getInstance().inject('accountDAO');
 	}
 
 	async signup(account: any) {

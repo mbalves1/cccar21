@@ -7,10 +7,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const registry = new Registry();
 const accountDAO = new AccountDAODatabase();
-registry.provide('accountDAO', accountDAO);
-const accountService = new AccountService(registry);
+Registry.getInstance().provide('accountDAO', accountDAO);
+const accountService = new AccountService();
 
 app.post('/signup', async (req: Request, res: Response) => {
 	const account = req.body;

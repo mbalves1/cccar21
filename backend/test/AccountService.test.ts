@@ -6,11 +6,10 @@ import Registry from '../src/Registry';
 let accountService: AccountService;
 
 beforeEach(() => {
-	const registry = new Registry();
 	const accountDAO = new AccountDAODatabase();
-	registry.provide('accountDAO', accountDAO);
+	Registry.getInstance().provide('accountDAO', accountDAO);
 	// const accountDAO = new AccountDAOMemory();
-	accountService = new AccountService(registry);
+	accountService = new AccountService();
 });
 
 test('Deve criar uma conta', async () => {
@@ -211,9 +210,8 @@ test('Deve criar uma conta com mock', async () => {
 
 test('Deve criar uma conta com fake', async () => {
 	const accountDAO = new AccountDAOMemory();
-	const registry = new Registry();
-	registry.provide('accountDAO', accountDAO);
-	accountService = new AccountService(registry);
+	Registry.getInstance().provide('accountDAO', accountDAO);
+	accountService = new AccountService();
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
