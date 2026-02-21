@@ -5,14 +5,11 @@ import { validatePassword } from './validatePassword';
 import { validateEmail } from './validateEmail';
 import { validateName } from './validateName';
 import AccountDAO, { AccountDAODatabase } from './AccountDAO';
-import Registry from './Registry';
+import { inject } from './Registry';
 
 export default class AccountService {
-	accountDAO: AccountDAO;
-
-	constructor() {
-		this.accountDAO = Registry.getInstance().inject('accountDAO');
-	}
+	@inject('accountDAO')
+	accountDAO!: AccountDAO;
 
 	async signup(account: any) {
 		account.accountId = crypto.randomUUID();
