@@ -1,6 +1,7 @@
 import express, { Response, Request } from 'express';
 import cors from 'cors';
 import { AccountDAODatabase } from './AccountDAO';
+import { AccountAssetDAODatabase } from './AccountAssetDAO';
 import AccountService from './AccountService';
 import Registry from './Registry';
 const app = express();
@@ -8,6 +9,10 @@ app.use(express.json());
 app.use(cors());
 
 Registry.getInstance().provide('accountDAO', new AccountDAODatabase());
+Registry.getInstance().provide(
+	'accountAssetDAO',
+	new AccountAssetDAODatabase(),
+);
 const accountService = new AccountService();
 
 app.post('/signup', async (req: Request, res: Response) => {

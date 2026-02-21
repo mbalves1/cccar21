@@ -1,13 +1,19 @@
 import { AccountDAODatabase, AccountDAOMemory } from '../src/AccountDAO';
+import { AccountAssetDAODatabase } from '../src/AccountAssetDAO';
 import AccountService from '../src/AccountService';
 import sinon from 'sinon';
 import Registry from '../src/Registry';
+import crypto from 'crypto';
 
 let accountService: AccountService;
 
 beforeEach(() => {
 	const accountDAO = new AccountDAODatabase();
 	Registry.getInstance().provide('accountDAO', accountDAO);
+	Registry.getInstance().provide(
+		'accountAssetDAO',
+		new AccountAssetDAODatabase(),
+	);
 	// const accountDAO = new AccountDAOMemory();
 	accountService = new AccountService();
 });
@@ -228,4 +234,65 @@ test('Deve criar uma conta com fake', async () => {
 	expect(outputGetAccount.email).toBe(input.email);
 	expect(outputGetAccount.document).toBe(input.document);
 	expect(outputGetAccount.password).toBe(input.password);
+});
+
+test('Deve depositar em uma conta', async () => {
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await accountService.signup(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 100,
+	};
+	await accountService.deposit(inputDeposit);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
+	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
+	expect(outputGetAccount.balances[0].quantity).toBe('100');
+});
+
+test('Não deve depositar em uma conta que não existe', async () => {
+	const inputDeposit = {
+		accountId: crypto.randomUUID(),
+		assetId: 'USD',
+		quantity: 100,
+	};
+	await expect(() => accountService.deposit(inputDeposit)).rejects.toThrow(
+		new Error('Account not found!'),
+	);
+});
+
+test.only('Deve sacar de uma conta', async () => {
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await accountService.signup(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 1000,
+	};
+	await accountService.deposit(inputDeposit);
+	const inputWithDraw = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 300,
+	};
+	await accountService.withDraw(inputWithDraw);
+	const outputGetAccount = await accountService.getAccount(
+		outputSignup.accountId,
+	);
+	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
+	expect(outputGetAccount.balances[0].quantity).toBe('700');
 });

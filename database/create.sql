@@ -10,7 +10,7 @@ create table cccar.account (
   password text
 );
 
-create table ccca.account_asset (
+create table cccar.account_asset (
   account_id uuid,
   asset_id text,
   quantity numeric,

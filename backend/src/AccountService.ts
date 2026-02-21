@@ -5,11 +5,14 @@ import { validatePassword } from './validatePassword';
 import { validateEmail } from './validateEmail';
 import { validateName } from './validateName';
 import AccountDAO, { AccountDAODatabase } from './AccountDAO';
+import AccountAssetDAO from './AccountAssetDAO';
 import { inject } from './Registry';
 
 export default class AccountService {
 	@inject('accountDAO')
 	accountDAO!: AccountDAO;
+	@inject('accountAssetDAO')
+	accountAssetDAO!: AccountAssetDAO;
 
 	async signup(account: any) {
 		account.accountId = crypto.randomUUID();
@@ -26,6 +29,27 @@ export default class AccountService {
 
 	async getAccount(accountId: any) {
 		const account = await this.accountDAO.getById(accountId);
+		account.balances = await this.accountAssetDAO.getByAccountId(accountId);
 		return account;
+	}
+
+	async deposit(accountAsset: any) {
+		const account = await this.accountDAO.getById(accountAsset.accountId);
+		if (!account) throw new Error('Account not found!');
+		await this.accountAssetDAO.save(accountAsset);
+	}
+
+	async withDraw(accountAsset: any) {
+		const account = await this.getAccount(accountAsset.accountId);
+		const balances = account.balances.find(
+			(balance: any) => balance.asset_id === accountAsset.assetId,
+		);
+		const quantity = parseFloat(balances.quantity) - accountAsset.quantity;
+		console.log('q aunt>>', quantity);
+		await this.accountAssetDAO.update({
+			accountId: accountAsset.accountId,
+			assetId: accountAsset.assetId,
+			quantity,
+		});
 	}
 }
