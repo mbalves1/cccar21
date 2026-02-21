@@ -29,6 +29,7 @@ export default class AccountService {
 
 	async getAccount(accountId: any) {
 		const account = await this.accountDAO.getById(accountId);
+		if (!account) throw new Error('Account not found!');
 		account.balances = await this.accountAssetDAO.getByAccountId(accountId);
 		return account;
 	}
@@ -45,7 +46,7 @@ export default class AccountService {
 			(balance: any) => balance.asset_id === accountAsset.assetId,
 		);
 		const quantity = parseFloat(balances.quantity) - accountAsset.quantity;
-		console.log('q aunt>>', quantity);
+		if (quantity < 0) throw new Error('Insuficient funds');
 		await this.accountAssetDAO.update({
 			accountId: accountAsset.accountId,
 			assetId: accountAsset.assetId,

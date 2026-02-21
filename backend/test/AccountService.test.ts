@@ -269,7 +269,7 @@ test('Não deve depositar em uma conta que não existe', async () => {
 	);
 });
 
-test.only('Deve sacar de uma conta', async () => {
+test('Deve sacar de uma conta', async () => {
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -295,4 +295,29 @@ test.only('Deve sacar de uma conta', async () => {
 	);
 	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
 	expect(outputGetAccount.balances[0].quantity).toBe('700');
+});
+
+test('Não deve sacar de uma conta se não tiver saldo', async () => {
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await accountService.signup(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 500,
+	};
+	await accountService.deposit(inputDeposit);
+	const inputWithDraw = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 1000,
+	};
+	await expect(() => accountService.withDraw(inputWithDraw)).rejects.toThrow(
+		new Error('Insuficient funds'),
+	);
 });
