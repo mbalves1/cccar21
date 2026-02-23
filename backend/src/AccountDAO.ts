@@ -1,4 +1,4 @@
-import pgp from 'pg-promise';
+import { PgPromiseAdapter } from './DatabaseConnection';
 
 export default interface AccountDAO {
 	save(account: any): Promise<void>;
@@ -7,7 +7,7 @@ export default interface AccountDAO {
 
 export class AccountDAODatabase implements AccountDAO {
 	async save(account: any): Promise<void> {
-		const connection = pgp()('postgres://postgres:123456@db:5432/app');
+		const connection = new PgPromiseAdapter();
 		await connection.query(
 			'insert into cccar.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)',
 			[
@@ -19,16 +19,16 @@ export class AccountDAODatabase implements AccountDAO {
 				account.message,
 			],
 		);
-		await connection.$pool.end();
+		await connection.close();
 	}
 
 	async getById(accountId: string): Promise<any> {
-		const connection = pgp()('postgres://postgres:123456@db:5432/app');
+		const connection = new PgPromiseAdapter();
 		const [account] = await connection.query(
 			'select * from cccar.account where account_id = $1',
 			[accountId],
 		);
-		await connection.$pool.end();
+		await connection.close();
 		return account;
 	}
 }
