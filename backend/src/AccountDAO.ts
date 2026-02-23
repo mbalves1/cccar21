@@ -1,4 +1,5 @@
-import { PgPromiseAdapter } from './DatabaseConnection';
+import DatabaseConnection from './DatabaseConnection';
+import { inject } from './Registry';
 
 export default interface AccountDAO {
 	save(account: any): Promise<void>;
@@ -6,9 +7,11 @@ export default interface AccountDAO {
 }
 
 export class AccountDAODatabase implements AccountDAO {
+	@inject('databaseConnection')
+	connection!: DatabaseConnection;
+
 	async save(account: any): Promise<void> {
-		const connection = new PgPromiseAdapter();
-		await connection.query(
+		await this.connection.query(
 			'insert into cccar.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)',
 			[
 				account.accountId,
@@ -19,16 +22,13 @@ export class AccountDAODatabase implements AccountDAO {
 				account.message,
 			],
 		);
-		await connection.close();
 	}
 
 	async getById(accountId: string): Promise<any> {
-		const connection = new PgPromiseAdapter();
-		const [account] = await connection.query(
+		const [account] = await this.connection.query(
 			'select * from cccar.account where account_id = $1',
 			[accountId],
 		);
-		await connection.close();
 		return account;
 	}
 }

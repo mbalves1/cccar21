@@ -1,13 +1,19 @@
 import { AccountDAODatabase, AccountDAOMemory } from '../src/AccountDAO';
-import { AccountAssetDAODatabase } from '../src/AccountAssetDAO';
 import AccountService from '../src/AccountService';
 import sinon from 'sinon';
 import Registry from '../src/Registry';
+import { AccountAssetDAODatabase } from '../src/AccountAssetDAO';
 import crypto from 'crypto';
+import DatabaseConnection, {
+	PgPromiseAdapter,
+} from '../src/DatabaseConnection';
 
+let connection: DatabaseConnection;
 let accountService: AccountService;
 
 beforeEach(() => {
+	connection = new PgPromiseAdapter();
+	Registry.getInstance().provide('databaseConnection', connection);
 	const accountDAO = new AccountDAODatabase();
 	Registry.getInstance().provide('accountDAO', accountDAO);
 	Registry.getInstance().provide(
@@ -320,4 +326,8 @@ test('Não deve sacar de uma conta se não tiver saldo', async () => {
 	await expect(() => accountService.withDraw(inputWithDraw)).rejects.toThrow(
 		new Error('Insuficient funds'),
 	);
+});
+
+afterEach(async () => {
+	await connection.close();
 });
