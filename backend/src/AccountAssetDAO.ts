@@ -1,4 +1,5 @@
-import pgp from 'pg-promise';
+import DatabaseConnection from './DatabaseConnection';
+import { inject } from './Registry';
 
 export default interface AccountAssetDAO {
 	save(account: any): Promise<void>;
@@ -7,31 +8,29 @@ export default interface AccountAssetDAO {
 }
 
 export class AccountAssetDAODatabase implements AccountAssetDAO {
+	@inject('databaseConnection')
+	connection!: DatabaseConnection;
+
 	async save(accountAsset: any): Promise<void> {
-		const connection = pgp()('postgres://postgres:123456@db:5432/app');
-		await connection.query(
+		await this.connection.query(
 			'insert into cccar.account_asset (account_id, asset_id, quantity) values ($1, $2, $3)',
 			[accountAsset.accountId, accountAsset.assetId, accountAsset.quantity],
 		);
-		await connection.$pool.end();
 	}
 
 	async update(accountAsset: any): Promise<void> {
-		const connection = pgp()('postgres://postgres:123456@db:5432/app');
-		await connection.query(
+		await this.connection.query(
 			'update cccar.account_asset set quantity = $1 where account_id = $2 and asset_id = $3',
 			[accountAsset.quantity, accountAsset.accountId, accountAsset.assetId],
 		);
-		await connection.$pool.end();
 	}
 
 	async getByAccountId(accountId: string): Promise<any> {
-		const connection = pgp()('postgres://postgres:123456@db:5432/app');
-		const accountAssets = await connection.query(
+		const accountAssets = await this.connection.query(
 			'select * from cccar.account_asset where account_id = $1',
 			[accountId],
 		);
-		await connection.$pool.end();
+
 		return accountAssets;
 	}
 }
