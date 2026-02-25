@@ -4,30 +4,22 @@ import AccountService from './AccountService';
 import Registry from './Registry';
 import { ExpressAdapter } from './HttpServer';
 import { PgPromiseAdapter } from './DatabaseConnection';
+import AccountController from './AccountController';
 
-Registry.getInstance().provide('databaseConnection', new PgPromiseAdapter());
-Registry.getInstance().provide('accountDAO', new AccountDAODatabase());
-Registry.getInstance().provide(
-	'accountAssetDAO',
-	new AccountAssetDAODatabase(),
-);
-const accountService = new AccountService();
-const httpServer = new ExpressAdapter();
+// Entrypoint
+async function main() {
+	const httpServer = new ExpressAdapter();
+	Registry.getInstance().provide('databaseConnection', new PgPromiseAdapter());
+	Registry.getInstance().provide('accountDAO', new AccountDAODatabase());
+	Registry.getInstance().provide(
+		'accountAssetDAO',
+		new AccountAssetDAODatabase(),
+	);
+	Registry.getInstance().provide('accountService', new AccountService());
+	Registry.getInstance().provide('httpServer', httpServer);
+	new AccountController();
 
-httpServer.route('post', '/signup', async (params: any, body: any) => {
-	console.log('body', body);
+	httpServer.listen(3000);
+}
 
-	const output = await accountService.signup(body);
-	return output;
-});
-
-httpServer.route(
-	'get',
-	'/accounts/:accountId',
-	async (params: any, body: any) => {
-		const output = await accountService.getAccount(params.accountId);
-		return output;
-	},
-);
-
-httpServer.listen(3000);
+main();
