@@ -1,7 +1,10 @@
 import crypto from 'crypto';
 import { AccountDAODatabase } from '../src/AccountDAO';
+import Registry from '../src/Registry';
+import { PgPromiseAdapter } from '../src/DatabaseConnection';
 
 test('Deve persistir uma conta', async () => {
+	Registry.getInstance().provide('databaseConnection', new PgPromiseAdapter());
 	const accountDAO = new AccountDAODatabase();
 	const account = {
 		accountId: crypto.randomUUID(),
