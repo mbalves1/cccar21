@@ -4,7 +4,8 @@ import Registry from '../src/Registry';
 import { PgPromiseAdapter } from '../src/DatabaseConnection';
 
 test('Deve persistir uma conta', async () => {
-	Registry.getInstance().provide('databaseConnection', new PgPromiseAdapter());
+	const connection = new PgPromiseAdapter();
+	Registry.getInstance().provide('databaseConnection', connection);
 	const accountDAO = new AccountDAODatabase();
 	const account = {
 		accountId: crypto.randomUUID(),
@@ -21,4 +22,5 @@ test('Deve persistir uma conta', async () => {
 	expect(savedAccount.email).toBe(account.email);
 	expect(savedAccount.document).toBe(account.document);
 	expect(savedAccount.password).toBe(account.password);
+	await connection.close();
 });

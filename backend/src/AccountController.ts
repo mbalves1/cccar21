@@ -1,6 +1,7 @@
 import AccountService from './AccountService';
 import HttpServer from './HttpServer';
 import { inject } from './Registry';
+import Signup from './Signup';
 
 // Interface Adapter
 export default class AccountController {
@@ -8,12 +9,14 @@ export default class AccountController {
 	httpServer!: HttpServer;
 	@inject('accountService')
 	accountService!: AccountService;
+	@inject('signup')
+	signup!: Signup;
 
 	constructor() {
 		this.httpServer.route('post', '/signup', async (params: any, body: any) => {
 			console.log('body', body);
 
-			const output = await this.accountService.signup(body);
+			const output = await this.signup.execute(body);
 			return output;
 		});
 
