@@ -6,6 +6,7 @@ import { ExpressAdapter } from './HttpServer';
 import { PgPromiseAdapter } from './DatabaseConnection';
 import AccountController from './AccountController';
 import Signup from './Signup';
+import GetAccount from './GetAccount';
 
 // Entrypoint
 async function main() {
@@ -19,8 +20,9 @@ async function main() {
 	Registry.getInstance().provide('accountService', new AccountService());
 	Registry.getInstance().provide('httpServer', httpServer);
 	Registry.getInstance().provide('signup', new Signup());
-	new AccountController();
+	Registry.getInstance().provide('getAccount', new GetAccount());
 
+	new AccountController();
 	httpServer.listen(3000);
 }
 

@@ -1,4 +1,4 @@
-import AccountService from './AccountService';
+import GetAccount from './GetAccount';
 import HttpServer from './HttpServer';
 import { inject } from './Registry';
 import Signup from './Signup';
@@ -7,10 +7,10 @@ import Signup from './Signup';
 export default class AccountController {
 	@inject('httpServer')
 	httpServer!: HttpServer;
-	@inject('accountService')
-	accountService!: AccountService;
 	@inject('signup')
 	signup!: Signup;
+	@inject('getAccount')
+	getAcoount!: GetAccount;
 
 	constructor() {
 		this.httpServer.route('post', '/signup', async (params: any, body: any) => {
@@ -24,7 +24,7 @@ export default class AccountController {
 			'get',
 			'/accounts/:accountId',
 			async (params: any, body: any) => {
-				const output = await this.accountService.getAccount(params.accountId);
+				const output = await this.getAcoount.execute(params.accountId);
 				return output;
 			},
 		);
