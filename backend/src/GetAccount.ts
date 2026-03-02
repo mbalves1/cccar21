@@ -22,4 +22,5 @@ type Output = {
 	email: string;
 	document: string;
 	password: string;
+	balances: { asset_id: string; quantity: number }[];
 };

@@ -1,0 +1,58 @@
+import { AccountDAODatabase } from '../src/AccountDAO';
+import Registry from '../src/Registry';
+import { AccountAssetDAODatabase } from '../src/AccountAssetDAO';
+import DatabaseConnection, {
+	PgPromiseAdapter,
+} from '../src/DatabaseConnection';
+import Signup from '../src/Signup';
+import GetAccount from '../src/GetAccount';
+import Deposit from '../src/Deposit';
+
+let connection: DatabaseConnection;
+let signup: Signup;
+let getAccount: GetAccount;
+let deposit: Deposit;
+
+beforeEach(() => {
+	connection = new PgPromiseAdapter();
+	Registry.getInstance().provide('databaseConnection', connection);
+	const accountDAO = new AccountDAODatabase();
+	Registry.getInstance().provide('accountDAO', accountDAO);
+	Registry.getInstance().provide(
+		'accountAssetDAO',
+		new AccountAssetDAODatabase(),
+	);
+	signup = new Signup();
+	getAccount = new GetAccount();
+	deposit = new Deposit();
+});
+
+test('Deve sacar de uma conta', async () => {
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await signup.execute(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 1000,
+	};
+	await deposit.execute(inputDeposit);
+	const inputWithDraw = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 300,
+	};
+	// await accountService.withDraw(inputWithDraw);
+	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
+	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
+	expect(outputGetAccount.balances[0].quantity).toBe('1000');
+});
+
+afterEach(async () => {
+	await connection.close();
+});
