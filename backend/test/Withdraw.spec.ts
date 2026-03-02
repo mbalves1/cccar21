@@ -7,11 +7,13 @@ import DatabaseConnection, {
 import Signup from '../src/Signup';
 import GetAccount from '../src/GetAccount';
 import Deposit from '../src/Deposit';
+import Withdraw from '../src/Withdraw';
 
 let connection: DatabaseConnection;
 let signup: Signup;
 let getAccount: GetAccount;
 let deposit: Deposit;
+let withdraw: Withdraw;
 
 beforeEach(() => {
 	connection = new PgPromiseAdapter();
@@ -25,6 +27,7 @@ beforeEach(() => {
 	signup = new Signup();
 	getAccount = new GetAccount();
 	deposit = new Deposit();
+	withdraw = new Withdraw();
 });
 
 test('Deve sacar de uma conta', async () => {
@@ -47,10 +50,10 @@ test('Deve sacar de uma conta', async () => {
 		assetId: 'USD',
 		quantity: 300,
 	};
-	// await accountService.withDraw(inputWithDraw);
+	await withdraw.execute(inputWithDraw);
 	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
 	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
-	expect(outputGetAccount.balances[0].quantity).toBe('1000');
+	expect(outputGetAccount.balances[0].quantity).toBe('700');
 });
 
 afterEach(async () => {
