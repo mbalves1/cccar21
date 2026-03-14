@@ -46,6 +46,18 @@ test('Deve criar uma conta', async () => {
 	expect(outputGetAccount.password).toBe(input.password);
 });
 
+test('Não deve criar uma conta com nome invalido', async () => {
+	const input = {
+		name: 'John',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+	await expect(() => signup.execute(input)).rejects.toThrow(
+		new Error('Invalid name'),
+	);
+});
+
 afterEach(async () => {
 	await connection.close();
 });

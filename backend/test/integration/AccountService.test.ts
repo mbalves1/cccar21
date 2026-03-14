@@ -39,58 +39,6 @@ test('Não deve criar uma conta se nome for inválido', async () => {
 	);
 });
 
-test('Não deve criar uma conta se email for inválido', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email',
-		document: '07830021066',
-		password: 'mnbVCX1234',
-	};
-
-	await expect(() => accountService.signup(input)).rejects.toThrow(
-		new Error('Invalid email'),
-	);
-});
-
-test('Não deve criar uma conta se documento for inválido', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '872222888',
-		password: 'mnbVCX1234',
-	};
-
-	await expect(() => accountService.signup(input)).rejects.toThrow(
-		new Error('Invalid document'),
-	);
-});
-
-test('Não deve criar uma conta se a senha for inválido', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '07830021066',
-		password: 'mnbVCX',
-	};
-
-	await expect(() => accountService.signup(input)).rejects.toThrow(
-		new Error('Invalid password'),
-	);
-});
-
-test('Não deve criar uma conta se a senha tiver menos de 8 caracteres', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '07830021066',
-		password: 'mnbVCX',
-	};
-
-	await expect(() => accountService.signup(input)).rejects.toThrow(
-		new Error('Invalid password'),
-	);
-});
-
 test('Não deve criar uma conta se a senha não tiver números', async () => {
 	const input = {
 		name: 'John Doe',
@@ -256,59 +204,6 @@ test('Não deve depositar em uma conta que não existe', async () => {
 	};
 	await expect(() => accountService.deposit(inputDeposit)).rejects.toThrow(
 		new Error('Account not found!'),
-	);
-});
-
-test('Deve sacar de uma conta', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '07830021066',
-		password: 'mnbVCX1234',
-	};
-
-	const outputSignup = await accountService.signup(input);
-	const inputDeposit = {
-		accountId: outputSignup.accountId,
-		assetId: 'USD',
-		quantity: 1000,
-	};
-	await accountService.deposit(inputDeposit);
-	const inputWithDraw = {
-		accountId: outputSignup.accountId,
-		assetId: 'USD',
-		quantity: 300,
-	};
-	await accountService.withDraw(inputWithDraw);
-	const outputGetAccount = await accountService.getAccount(
-		outputSignup.accountId,
-	);
-	expect(outputGetAccount.balances[0].asset_id).toBe('USD');
-	expect(outputGetAccount.balances[0].quantity).toBe('700');
-});
-
-test('Não deve sacar de uma conta se não tiver saldo', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '07830021066',
-		password: 'mnbVCX1234',
-	};
-
-	const outputSignup = await accountService.signup(input);
-	const inputDeposit = {
-		accountId: outputSignup.accountId,
-		assetId: 'USD',
-		quantity: 500,
-	};
-	await accountService.deposit(inputDeposit);
-	const inputWithDraw = {
-		accountId: outputSignup.accountId,
-		assetId: 'USD',
-		quantity: 1000,
-	};
-	await expect(() => accountService.withDraw(inputWithDraw)).rejects.toThrow(
-		new Error('Insuficient funds'),
 	);
 });
 

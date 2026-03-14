@@ -63,3 +63,16 @@ test('Deve fazer um saque', function () {
 	account.withdraw('USD', 100);
 	expect(account.balances[0].quantity).toBe(400);
 });
+
+test('Não deve fazer um saque se não tiver saldo', function () {
+	const account = Account.create(
+		'John Doe',
+		'john.doe@email.com',
+		'078.300.210-66',
+		'asdaaSsd23@',
+	);
+	account.deposit('USD', 500);
+	expect(() => account.withdraw('USD', 1000)).toThrow(
+		new Error('Insuficient funds'),
+	);
+});

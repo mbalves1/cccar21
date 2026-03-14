@@ -61,6 +61,31 @@ test('Deve sacar de uma conta', async () => {
 	expect(outputGetAccount.balances[0].quantity).toBe(700);
 });
 
+test('Não deve sacar de uma conta se não tiver saldo', async () => {
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await signup.execute(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 500,
+	};
+	await deposit.execute(inputDeposit);
+	const inputWithDraw = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 1000,
+	};
+	await expect(() => withdraw.execute(inputWithDraw)).rejects.toThrow(
+		new Error('Insuficient funds'),
+	);
+});
+
 afterEach(async () => {
 	await connection.close();
 });
