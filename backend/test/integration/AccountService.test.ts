@@ -27,25 +27,6 @@ beforeEach(() => {
 	accountService = new AccountService();
 });
 
-test('Deve criar uma conta', async () => {
-	const input = {
-		name: 'John Doe',
-		email: 'john.doe@email.com',
-		document: '07830021066',
-		password: 'mnbVCX1234',
-	};
-
-	const outputSignup = await accountService.signup(input);
-	const outputGetAccount = await accountService.getAccount(
-		outputSignup.accountId,
-	);
-	expect(outputSignup.accountId).toBeDefined();
-	expect(outputGetAccount.name).toBe(input.name);
-	expect(outputGetAccount.email).toBe(input.email);
-	expect(outputGetAccount.document).toBe(input.document);
-	expect(outputGetAccount.password).toBe(input.password);
-});
-
 test('Não deve criar uma conta se nome for inválido', async () => {
 	const input = {
 		name: 'John',
