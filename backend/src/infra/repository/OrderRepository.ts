@@ -5,6 +5,7 @@ import { inject } from '../di/Registry';
 export default interface OrderRepository {
 	save(order: Order): Promise<void>;
 	getById(orderId: string): Promise<Order>;
+	getByMarketIdAndStatus(marketId: string, status: string): Promise<Order[]>;
 }
 
 export class OrderRepositoryDatabase implements OrderRepository {
@@ -49,5 +50,32 @@ export class OrderRepositoryDatabase implements OrderRepository {
 			orderData.status,
 			orderData.timestamp,
 		);
+	}
+
+	async getByMarketIdAndStatus(
+		marketId: string,
+		status: string,
+	): Promise<Order[]> {
+		const ordersData = await this.connection.query(
+			'select * from cccar.order where market_id = $1 and status = $2',
+			[marketId, status],
+		);
+		const orders: Order[] = [];
+		for (const orderData of ordersData) {
+			const order = new Order(
+				orderData.order_id,
+				orderData.account_id,
+				orderData.market_id,
+				orderData.side,
+				parseFloat(orderData.quantity),
+				parseFloat(orderData.price),
+				parseFloat(orderData.fill_quantity),
+				parseFloat(orderData.fill_price),
+				orderData.status,
+				orderData.timestamp,
+			);
+			orders.push(order);
+		}
+		return orders;
 	}
 }

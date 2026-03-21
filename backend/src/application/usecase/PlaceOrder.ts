@@ -18,7 +18,7 @@ export default class PlaceOrder {
 			input.quantity,
 			input.price,
 		);
-		this.orderRepository.save(order);
+		await this.orderRepository.save(order);
 		return {
 			orderId: order.orderId,
 		};

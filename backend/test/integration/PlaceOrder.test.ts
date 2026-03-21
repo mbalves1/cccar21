@@ -12,6 +12,7 @@ import Registry from '../../src/infra/di/Registry';
 import PlaceOrder from '../../src/application/usecase/PlaceOrder';
 import GetOrder from '../../src/application/usecase/GetOrder';
 import { OrderRepositoryDatabase } from '../../src/infra/repository/OrderRepository';
+import GetDepth from '../../src/application/usecase/GetDepth';
 
 let connection: DatabaseConnection;
 let signup: Signup;
@@ -20,6 +21,7 @@ let deposit: Deposit;
 let withdraw: Withdraw;
 let placeOrder: PlaceOrder;
 let getOrder: GetOrder;
+let getDepth: GetDepth;
 
 beforeEach(() => {
 	connection = new PgPromiseAdapter();
@@ -44,9 +46,11 @@ beforeEach(() => {
 	withdraw = new Withdraw();
 	placeOrder = new PlaceOrder();
 	getOrder = new GetOrder();
+	getDepth = new GetDepth();
 });
 
 test('Deve criar uma ordem de compra', async () => {
+	const marketId = `BTC/USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -64,7 +68,7 @@ test('Deve criar uma ordem de compra', async () => {
 
 	const inputPlaceOrder = {
 		accountId: outputSignup.accountId,
-		marketId: 'BTC/USD',
+		marketId,
 		side: 'buy',
 		quantity: 1,
 		price: 85000,
@@ -72,11 +76,52 @@ test('Deve criar uma ordem de compra', async () => {
 	const outputPlaceOrder = await placeOrder.execute(inputPlaceOrder);
 	expect(outputPlaceOrder.orderId).toBeDefined();
 	const outputGetOrder = await getOrder.execute(outputPlaceOrder.orderId);
-
 	expect(outputGetOrder.marketId).toBe(inputPlaceOrder.marketId);
 	expect(outputGetOrder.side).toBe(inputPlaceOrder.side);
 	expect(outputGetOrder.quantity).toBe(inputPlaceOrder.quantity);
 	expect(outputGetOrder.price).toBe(inputPlaceOrder.price);
+	const outputGetDepth = await getDepth.execute(marketId);
+	expect(outputGetDepth.buys).toHaveLength(1);
+	expect(outputGetDepth.sells).toHaveLength(0);
+	expect(outputGetDepth.buys[0].quantity).toBe(1);
+	expect(outputGetDepth.buys[0].price).toBe(85000);
+});
+
+test('Deve criar varias ordens de compra e verificar o depth', async () => {
+	const marketId = `BTC/USD/${Math.random()}`;
+	const input = {
+		name: 'John Doe',
+		email: 'john.doe@email.com',
+		document: '07830021066',
+		password: 'mnbVCX1234',
+	};
+
+	const outputSignup = await signup.execute(input);
+	const inputDeposit = {
+		accountId: outputSignup.accountId,
+		assetId: 'USD',
+		quantity: 10000000,
+	};
+	await deposit.execute(inputDeposit);
+	await placeOrder.execute({
+		accountId: outputSignup.accountId,
+		marketId,
+		side: 'buy',
+		quantity: 1,
+		price: 85000,
+	});
+	await placeOrder.execute({
+		accountId: outputSignup.accountId,
+		marketId,
+		side: 'buy',
+		quantity: 1,
+		price: 85000,
+	});
+	const outputGetDepth = await getDepth.execute(marketId);
+	expect(outputGetDepth.buys).toHaveLength(1);
+	expect(outputGetDepth.sells).toHaveLength(0);
+	expect(outputGetDepth.buys[0].quantity).toBe(2);
+	expect(outputGetDepth.buys[0].price).toBe(85000);
 });
 
 afterEach(async () => {
