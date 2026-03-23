@@ -10,7 +10,7 @@ export default class Order {
 		readonly price: number,
 		readonly fillQuantity: number,
 		readonly fillPrice: number,
-		readonly status: string,
+		public status: string,
 		readonly timestamp: Date,
 	) {}
 
@@ -38,5 +38,9 @@ export default class Order {
 			status,
 			timestamp,
 		);
+	}
+
+	fill() {
+		this.status = 'closed';
 	}
 }

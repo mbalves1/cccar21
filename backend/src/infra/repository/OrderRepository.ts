@@ -4,6 +4,7 @@ import { inject } from '../di/Registry';
 
 export default interface OrderRepository {
 	save(order: Order): Promise<void>;
+	update(order: Order): Promise<void>;
 	getById(orderId: string): Promise<Order>;
 	getByMarketIdAndStatus(marketId: string, status: string): Promise<Order[]>;
 }
@@ -27,6 +28,13 @@ export class OrderRepositoryDatabase implements OrderRepository {
 				order.status,
 				order.timestamp,
 			],
+		);
+	}
+
+	async update(order: Order): Promise<void> {
+		await this.connection.query(
+			'update cccar.order set status = $1, fill_quantity = $2, fill_price = $3 where order_id = $4',
+			[order.status, order.fillQuantity, order.fillPrice, order.orderId],
 		);
 	}
 

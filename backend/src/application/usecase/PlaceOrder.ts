@@ -10,7 +10,6 @@ export default class PlaceOrder {
 	orderRepository!: OrderRepository;
 
 	async execute(input: Input): Promise<Output> {
-		const account = await this.accountRepository.getById(input.accountId);
 		const order = Order.create(
 			input.accountId,
 			input.marketId,
@@ -19,6 +18,29 @@ export default class PlaceOrder {
 			input.price,
 		);
 		await this.orderRepository.save(order);
+
+		const orders = await this.orderRepository.getByMarketIdAndStatus(
+			input.marketId,
+			'open',
+		);
+		const buys = orders
+			.filter((order: Order) => order.side === 'buy')
+			.sort((a, b) => b.price - a.price);
+		const sells = orders
+			.filter((order: Order) => order.side === 'sell')
+			.sort((a, b) => a.price - b.price);
+		const highestBuy = buys[0];
+		const lowestSell = sells[0];
+
+		if (!highestBuy || !lowestSell || highestBuy.price < lowestSell.price) {
+			console.log('Not match');
+		} else {
+			highestBuy.fill();
+			lowestSell.fill();
+			await this.orderRepository.update(highestBuy);
+			await this.orderRepository.update(lowestSell);
+		}
+
 		return {
 			orderId: order.orderId,
 		};
