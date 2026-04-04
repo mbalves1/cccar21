@@ -44,7 +44,7 @@ test('Não deve criar uma conta se nome for inválido', async () => {
 });
 
 test('Deve criar uma ordem de compra', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -96,7 +96,7 @@ test('Deve criar uma ordem de compra', async () => {
 });
 
 test('Deve criar varias ordens de compra e verificar o depth', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -140,7 +140,7 @@ test('Deve criar varias ordens de compra e verificar o depth', async () => {
 });
 
 test('Deve criar varias ordens de compra com precos diff e verificar o depth', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -193,7 +193,7 @@ test('Deve criar varias ordens de compra com precos diff e verificar o depth', a
 });
 
 test('Deve criar uma ordem de compra e outra de venda no mesmo valor', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -235,7 +235,7 @@ test('Deve criar uma ordem de compra e outra de venda no mesmo valor', async () 
 });
 
 test('Deve criar duas ordens de compra e uima ordem de venda, no mesmo valor e mesma quantidade', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
@@ -284,7 +284,7 @@ test('Deve criar duas ordens de compra e uima ordem de venda, no mesmo valor e m
 });
 
 test('Deve criar 3 ordens de compra e venda, com valores diferentes', async () => {
-	const marketId = `BTC/USD/${Math.random()}`;
+	const marketId = `BTC-USD/${Math.random()}`;
 	const input = {
 		name: 'John Doe',
 		email: 'john.doe@email.com',
