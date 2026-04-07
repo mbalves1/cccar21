@@ -26,5 +26,5 @@ test('Deve testar a execucao de ordens de compra e venda', async () => {
 	);
 	expect(book.buys).toHaveLength(0);
 	expect(book.sells).toHaveLength(0);
-	console.log(fills);
+	expect(fills).toHaveLength(2);
 });
