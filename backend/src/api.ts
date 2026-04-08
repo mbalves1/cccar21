@@ -16,6 +16,8 @@ import GetDepth from './application/usecase/GetDepth';
 import OrderController from './infra/controller/OrderController';
 import ExecuteOrder from './application/usecase/ExecuteOrder';
 import { MediatorMemory } from './infra/mediator/Mediator';
+import Book from './domain/Book';
+import Order from './domain/Order';
 
 // Entrypoint
 async function main() {
@@ -30,10 +32,8 @@ async function main() {
 		'accountRepository',
 		new AccountRepositoryDatabase(),
 	);
-	Registry.getInstance().provide(
-		'orderRepository',
-		new OrderRepositoryDatabase(),
-	);
+	const orderRepository = new OrderRepositoryDatabase();
+	Registry.getInstance().provide('orderRepository', orderRepository);
 	// Registry.getInstance().provide('accountService', new AccountService());
 	Registry.getInstance().provide('httpServer', httpServer);
 	Registry.getInstance().provide('signup', new Signup());
@@ -44,9 +44,14 @@ async function main() {
 	Registry.getInstance().provide('getDepth', new GetDepth());
 	const executeOrder = new ExecuteOrder();
 	const mediator = new MediatorMemory();
+	const book = new Book('BTC-USD');
 	Registry.getInstance().provide('mediator', mediator);
-	mediator.register('orderPlaced', async (event: any) => {
-		await executeOrder.execute(event.marketId);
+	mediator.register('orderPlaced', async (order: Order) => {
+		await book.insert(order);
+		// await executeOrder.execute(order.marketId);
+	});
+	mediator.register('orderFilled', async (order: Order) => {
+		await orderRepository.update(order);
 	});
 	new AccountController();
 	new OrderController();

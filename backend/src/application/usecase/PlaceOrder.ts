@@ -25,10 +25,7 @@ export default class PlaceOrder {
 
 		// const executeOrder = new ExecuteOrder();
 		// await executeOrder.execute(input.marketId);
-		await this.mediator.notifyAll('orderPlaced', {
-			marketId: order.marketId,
-			orderId: order.orderId,
-		});
+		await this.mediator.notifyAll('orderPlaced', order);
 
 		return {
 			orderId: order.orderId,
