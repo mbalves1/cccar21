@@ -18,7 +18,10 @@ import ExecuteOrder from './application/usecase/ExecuteOrder';
 import { MediatorMemory } from './infra/mediator/Mediator';
 import Book from './domain/Book';
 import Order from './domain/Order';
-import { OrderHandler1 } from './infra/handler/OrderHandler';
+import {
+	OrderHandlerBook,
+	OrderHandlerExecuteOrder,
+} from './infra/handler/OrderHandler';
 
 // Entrypoint
 async function main() {
@@ -48,10 +51,9 @@ async function main() {
 	Registry.getInstance().provide('getDepth', new GetDepth());
 	Registry.getInstance().provide('executeOrder', new ExecuteOrder());
 	Registry.getInstance().provide('book', new Book('BTC-USD'));
-	const handler = new OrderHandler1();
+	const handler = new OrderHandlerExecuteOrder();
+	// const handler = new OrderHandlerBook();
 	handler.handle();
-
-	new OrderHandler1();
 	new AccountController();
 	new OrderController();
 	httpServer.listen(3000);

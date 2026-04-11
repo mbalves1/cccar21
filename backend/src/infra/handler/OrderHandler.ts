@@ -9,7 +9,7 @@ export default interface OrderHandler {
 	handle(): void;
 }
 
-export class OrderHandler1 implements OrderHandler {
+export class OrderHandlerBook implements OrderHandler {
 	@inject('mediator')
 	mediator!: Mediator;
 	@inject('orderRepository')
@@ -27,7 +27,7 @@ export class OrderHandler1 implements OrderHandler {
 	}
 }
 
-export class OrderHandler2 implements OrderHandler {
+export class OrderHandlerExecuteOrder implements OrderHandler {
 	@inject('mediator')
 	mediator!: Mediator;
 	@inject('executeOrder')
