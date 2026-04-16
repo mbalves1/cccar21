@@ -1,5 +1,6 @@
 import { inject } from '../infra/di/Registry';
 import Mediator from '../infra/mediator/Mediator';
+import GroupOrders from './GroupOrders';
 import Order from './Order';
 
 export default class Book {
@@ -50,5 +51,15 @@ export default class Book {
 			await this.mediator.notifyAll('orderFilled', highestBuy);
 			await this.mediator.notifyAll('orderFilled', lowestSell);
 		}
+	}
+
+	getDepth() {
+		const buys = GroupOrders.execute(this.buys);
+		const sells = GroupOrders.execute(this.sells);
+		return {
+			marketId: this.marketId,
+			buys,
+			sells,
+		};
 	}
 }

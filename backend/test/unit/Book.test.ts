@@ -20,11 +20,13 @@ test('Deve testar a execucao de ordens de compra e venda', async () => {
 		'asdWSF2343',
 	);
 	await book.insert(Order.create(account.accountId, marketId, 'buy', 1, 85000));
-	expect(book.buys).toHaveLength(1);
+	const depth1 = book.getDepth();
+	expect(depth1.buys).toHaveLength(1);
 	await book.insert(
 		Order.create(account.accountId, marketId, 'sell', 1, 85000),
 	);
-	expect(book.buys).toHaveLength(0);
-	expect(book.sells).toHaveLength(0);
+	const depth2 = book.getDepth();
+	expect(depth2.buys).toHaveLength(0);
+	expect(depth2.sells).toHaveLength(0);
 	expect(fills).toHaveLength(2);
 });
