@@ -17,7 +17,7 @@ test('Deve persistir uma conta', async () => {
 	);
 	await orm.save(accountModel);
 	const savedAccountModel = await orm.get(
-		accountModel,
+		AccountModel,
 		'account_id',
 		accountId,
 	);
@@ -25,4 +25,5 @@ test('Deve persistir uma conta', async () => {
 	expect(savedAccountModel.email).toBe(accountModel.email);
 	expect(savedAccountModel.document).toBe(accountModel.document);
 	expect(savedAccountModel.password).toBe(accountModel.password);
+	await connection.close();
 });

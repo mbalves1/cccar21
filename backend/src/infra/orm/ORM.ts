@@ -1,13 +1,31 @@
+import DatabaseConnection from '../database/DatabaseConnection';
+import { inject } from '../di/Registry';
+
 export default class ORM {
+	@inject('databaseConnection')
+	connection!: DatabaseConnection;
+
 	async save(model: Model) {
 		console.log('Model', model.schema, model.table, model.columns);
 		const columns = model.columns.map((column: any) => column.column).join(',');
 		const params = model.columns.map((_, index) => `$${index + 1}`).join(',');
+		const values = model.columns.map((column) => model[column.property]);
 		const query = `insert into ${model.schema}.${model.table} (${columns}) values (${params})`;
+		await this.connection.query(query, values);
 	}
 
-	async get(model: Model, field: string, value: string): Promise<any> {
-		return {};
+	async get(model: any, field: string, value: string): Promise<any> {
+		const query = `select * from ${model.prototype.schema}.${model.prototype.table} where ${field} = $1`;
+		const [data] = await this.connection.query(query, value);
+		console.log(data);
+		if (!data) return;
+		const obj = new model();
+		for (const column of model.prototype.columns) {
+			obj[column.property] = data[column.column];
+		}
+		console.log(obj);
+
+		return obj;
 	}
 }
 
@@ -15,6 +33,7 @@ class Model {
 	schema!: string;
 	table!: string;
 	columns!: { column: string; property: string }[];
+	[property: string]: any;
 }
 
 @model('cccar', 'account')
